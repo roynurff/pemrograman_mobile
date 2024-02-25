@@ -12,7 +12,7 @@ void main() {
         ),
         body: Center(
           child: const Image(
-              image: AssetImage('images/fotokell.jpg')
+              image: AssetImage('images/kelll.jpg')
           ),
         ),
         backgroundColor: Colors.white,
