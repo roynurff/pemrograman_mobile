@@ -1,146 +1,350 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 
 void main() {
-  runApp(
-    MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title:
-              const Text('Kelompok 10', style: TextStyle(color: Colors.white)),
-          backgroundColor: Colors.blueAccent,
-          centerTitle : true,
-        ),
-        body: Center(
-          child: const Image(
-              image: AssetImage('images/kelll.jpg')
-          ),
-        ),
-        backgroundColor: Colors.white,
-      ),
-    ),
-  );
+  runApp(MyApp());
 }
 
-/**
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final List<KartuNama> kelompok = [
+    KartuNama(
+      nama: 'Muhammad Ainur Rofik',
+      jabatan: 'WEB DEVELOPER',
+      email: 'muhammadainur.22005@mhs.unesa.ac.id',
+      telepon: '+6285157110104',
+      foto: AssetImage('images/rofik.jpg'),
+    ),
+    KartuNama(
+      nama: 'Ihda Anisa Ulfa',
+      jabatan: 'DATA ANALYST',
+      email: 'ihdaanisa.22019@mhs.unesa.ac.id',
+      telepon: '+62882003365621',
+      foto: AssetImage('images/anisa.jpg'),
+    ),
+    KartuNama(
+      nama: 'Roy Nurfaza',
+      jabatan: 'ANDROID DEVELOPER',
+      email: 'roy.22035@mhs.unesa.ac.id',
+      telepon: '+6285853111266',
+      foto: AssetImage('images/roey.jpg'),
+    ),
+  ];
 
-
-
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a blue toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: KartuNamaPage(kelompok: kelompok),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+//TAMPILAN HOME KARTU NAMA------------------------------------------------------
 
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
+class KartuNamaPage extends StatelessWidget {
+  final List<KartuNama> kelompok;
+  KartuNamaPage({required this.kelompok});
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Color.fromARGB(66, 148, 148, 148),
+      appBar: AppBar(
+        title: Text(
+          'Anggota Kelompok',
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: Colors.blue,
+      ),
+      body: ListView.builder(
+        itemCount: kelompok.length,
+        itemBuilder: (context, index) {
+          return Card(
+            margin: EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+            color: Colors.grey[800],
+            child: InkWell(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => DetailKartuNama(kelompok[index]),
+                  ),
+                );
+              },
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: CircleAvatar(
+                      backgroundImage: kelompok[index].foto,
+                      backgroundColor: Colors.yellow,
+                      radius: 60,
+                    ),
+                  ),
+                  Text(
+                    kelompok[index].nama,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontFamily: 'Poppins',
+                    ),
+                  ),
+                  Text(
+                    kelompok[index].jabatan,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'Poppins',
+                      letterSpacing: 2,
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+class EditKartuNama extends StatefulWidget {
+  final KartuNama kartu;
 
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
+  EditKartuNama(this.kartu);
+
+  @override
+  _EditKartuNamaState createState() => _EditKartuNamaState();
+}
+
+class _EditKartuNamaState extends State<EditKartuNama> {
+  late TextEditingController _namaController;
+  late TextEditingController _jabatanController;
+  late TextEditingController _emailController;
+
+  @override
+  void initState() {
+    super.initState();
+    _namaController = TextEditingController(text: widget.kartu.nama);
+    _jabatanController = TextEditingController(text: widget.kartu.jabatan);
+    _emailController = TextEditingController(text: widget.kartu.email);
+  }
+
+  @override
+  void dispose() {
+    _namaController.dispose();
+    _jabatanController.dispose();
+    _emailController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
+      backgroundColor: Color.fromARGB(66, 148, 148, 148),
       appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
+        title: Text(
+          'Edit Data',
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: Colors.blue,
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
+      body: Padding(
+        padding: const EdgeInsets.all(20.0),
         child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            TextFormField(
+              controller: _namaController,
+              decoration: InputDecoration(labelText: 'Nama'),
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
+            SizedBox(height: 10),
+            TextFormField(
+              controller: _jabatanController,
+              decoration: InputDecoration(labelText: 'Jabatan'),
+            ),
+            SizedBox(height: 10),
+            TextFormField(
+              controller: _emailController,
+              decoration: InputDecoration(labelText: 'Email'),
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                // Simpan perubahan
+                KartuNama updatedKartu = KartuNama(
+                  nama: _namaController.text,
+                  jabatan: _jabatanController.text,
+                  email: _emailController.text,
+                  telepon: widget.kartu.telepon,
+                  foto: widget.kartu.foto,
+                );
+
+                // Kembalikan data yang telah diperbarui
+                Navigator.pop(context, updatedKartu);
+              },
+              child: Text('Simpan'),
             ),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
-*/
+
+//TAMPILAN DETAIL KATU NAMA-----------------------------------------------------
+
+class DetailKartuNama extends StatelessWidget {
+  final KartuNama kartu;
+
+  DetailKartuNama(this.kartu);
+
+  void _editData(BuildContext context, KartuNama kartu) async {
+    // Navigasi ke antarmuka pengguna penyuntingan dengan membawa data anggota
+    final updateKartu = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => EditKartuNama(kartu)),
+    );
+    if (updateKartu != null) {
+      // Jika ada perubahan data, ambil data baru dan t
+    }
+  }
+
+  
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Color.fromARGB(66, 148, 148, 148),
+      appBar: AppBar(
+        title: Text(
+          'Detail Data Anggota',
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: Colors.blue,
+        actions: [],
+      ),
+      body: Stack(
+        children: [
+          Center(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                SizedBox(height: 40),
+                CircleAvatar(
+                  backgroundImage: kartu.foto,
+                  backgroundColor: Colors.yellow,
+                  radius: 50,
+                ),
+                SizedBox(height: 10),
+
+//Nama Pada kartu nama
+
+                Text(
+                  '${kartu.nama}',
+                  style: TextStyle(
+                      fontSize: 20, color: Colors.white, fontFamily: 'Poppins'),
+                ),
+                SizedBox(height: 0),
+
+//Jabatan Pada kartu nama
+
+                Text(
+                  '${kartu.jabatan}',
+                  style: TextStyle(
+                      fontSize: 16, color: Colors.white, letterSpacing: 2),
+                ),
+                SizedBox(height: 10),
+
+//Container Telepon
+
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 5),
+                  width: 260,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(5),
+                    color: Colors.white,
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.phone_iphone, size: 30),
+                      Text(
+                        '${kartu.telepon}',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 12,
+                          fontFamily: 'Roboto',
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 10),
+
+//Container Email
+
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 5),
+                  width: 260,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(5),
+                    color: Colors.white,
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.mail_outline_rounded, size: 30),
+                      Text(
+                        '${kartu.email}',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 11,
+                          fontFamily: 'Roboto',
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Positioned(
+            bottom: 20,
+            right: 20,
+            child: FloatingActionButton(
+              onPressed: () {
+                _editData(context, kartu);
+              },
+              child: Icon(Icons.edit),
+              backgroundColor: Colors.white,
+              foregroundColor: Colors.black,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+//CircleAvatar
+
+class KartuNama {
+  final String nama;
+  final String jabatan;
+  final String email;
+  final String telepon;
+  final AssetImage foto;
+
+  KartuNama({
+    required this.nama,
+    required this.jabatan,
+    required this.email,
+    required this.telepon,
+    required this.foto,
+  });
+}
